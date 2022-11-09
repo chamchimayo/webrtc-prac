@@ -2,6 +2,7 @@ const express = require("express");
 const connect = require("./models");
 const cors = require("cors");
 const routers = require("./routes/index");
+const socketRouter = require("./socket.js")
 // const roomsRouter = require("./routes/room");
 // const swaggerUi = require('swagger-ui-express')
 // const YAML = require('yamljs')
@@ -44,7 +45,7 @@ app.use(express.urlencoded({ extended: false }));
 // })
 
 app.use("/", routers);
-
+app.use("/room", socketRouter)
 // 클라이언트에 error 내용 전송
 app.use((err, req, res, next) => {
   res.status(400).send({ errorMessage: err });
