@@ -1,7 +1,8 @@
-const express = require('express')
-const connect = require('./models')
-const cors = require('cors')
-const routers = require('./routes/user')
+const express = require("express");
+const connect = require("./models");
+const cors = require("cors");
+const routers = require("./routes/index");
+const roomsRouter = require("./routes/room");
 // const swaggerUi = require('swagger-ui-express')
 // const YAML = require('yamljs')
 // const swaggerDocument = YAML.load('./api/openapi.yaml')
@@ -13,14 +14,14 @@ const routers = require('./routes/user')
 // const hpp = require('hpp')
 // const rateLimit = require('express-rate-limit')
 
-const app = express()
-connect()
+const app = express();
+connect();
 
-app.use(cors({option: '*'})) // origin 추가
+app.use(cors({ option: "*" })); // origin 추가
 // app.use(helmet())
 // app.use(hpp())
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 // 1분동안 하나의 ip 주소에서 들어오는 request의 숫자를 100회로 제한
 // app.use(
 //     rateLimit({
@@ -42,14 +43,14 @@ app.use(express.urlencoded({ extended: false }))
 //     next()
 // })
 
-app.use("/", routers)
+app.use("/", routers);
 
 // 클라이언트에 error 내용 전송
 app.use((err, req, res, next) => {
-    res.status(400).send({ errorMessage: err })
-})
+  res.status(400).send({ errorMessage: err });
+});
 
 //Swagger api
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-module.exports = app
+module.exports = app;

@@ -13,7 +13,8 @@ const io = require("socket.io")(server, {
   },
 });
 
-router.post("/room", authMiddleware, (req, res) => {
+router.post("/", authMiddleware, (req, res) => {
+  console.log("authMiddleware: ", authMiddleware);
   let roomObjArr = [];
   let mediaStatus = {};
   const MAXIMUM = 5;
