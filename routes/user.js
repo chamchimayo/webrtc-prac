@@ -4,7 +4,7 @@ const company = require("../models/company");
 const users = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-router.post("/members/signup", async (req, res) => {
+router.post("/signup", async (req, res) => {
   const { memberEmail, password } = req.body;
   await users.create({ memberEmail, password });
   res.status(201).json({ messaage: "회원가입" });
@@ -16,7 +16,7 @@ router.post("/companySignup", async (req, res) => {
   res.status(201).json({ messaage: "회원가입" });
 });
 
-router.post("/members/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { memberEmail, password } = req.body;
 
   try {

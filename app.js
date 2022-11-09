@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: false }));
 // })
 
 app.use("/", routers);
-app.use("/room", socketRouter)
+// app.use("/room", socketRouter)
 // 클라이언트에 error 내용 전송
 app.use((err, req, res, next) => {
   res.status(400).send({ errorMessage: err });
