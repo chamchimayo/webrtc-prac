@@ -41,7 +41,7 @@ const MAXIMUM = 5
 //     }
 //     await roomHistory.save()
 // }
-router.post("/room/:roomName", authMiddleware, (req,res) => {
+router.post("/room/:roomName", (req,res) => {
     io.on('connection', (socket) => {
     let myRoomName = null
     // let email = null
