@@ -18,9 +18,7 @@ module.exports = (req, res, next) => {
     try {
       const { id }  = jwt.verify(authToken, process.env.JWT_SECRET);
       users.findById(id).then((user) => {
-        console.log("****", user);
         res.locals.user = user;
-        console.log("****", res.locals.user);
         next();
       });
     } catch (err) {
