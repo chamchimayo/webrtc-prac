@@ -41,14 +41,14 @@ const MAXIMUM = 5
 //     }
 //     await roomHistory.save()
 // }
-router.get("/rooms", authMiddleware, (req,res) => {
+app.get("/room/:roomName", authMiddleware, (req, res) => {
     io.on('connection', (socket) => {
     let myRoomName = null
     // let email = null
 
     socket.on('join_room', async (roomName, email) => {
         myRoomName = roomName
-        email = "alstjq1826@gmail.com"
+        email = email
 
         let isRoomExist = false
         let targetRoomObj = null
