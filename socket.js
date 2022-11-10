@@ -44,7 +44,6 @@ const MAXIMUM = 5;
 //     await roomHistory.save()
 // }
 app.get("/room/:roomName", authMiddleware, async(req, res) => {
-    console.log("here is come!!! 1");
   const { roomName } = req.params;
   const { id } = res.locals.user;
 
@@ -53,7 +52,7 @@ app.get("/room/:roomName", authMiddleware, async(req, res) => {
   
   const aaa = await Interview.create({roomName, interviewees: findMembers.id});
   console.log("dbdbdb", aaa);
-  
+
   io.on("connection", (socket) => {
     console.log("here is come!!! 2");
     let myRoomName = null;
