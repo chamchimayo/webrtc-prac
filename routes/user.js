@@ -30,12 +30,13 @@ router.post("/login", async (req, res) => {
       return;
     }
     const token = jwt.sign(
-      { memberEmail: findUser.memberEmail },
+      { id: findUser._id },
       process.env.JWT_SECRET
     );
     console.log("######", token);
     res.send({
       token: `Bearer ${token}`,
+      _id: findUser._id,
       memberEmail: findUser.memberEmail, // 있어도 그만 없어도 그만 일단 확인
     });
   } catch (err) {

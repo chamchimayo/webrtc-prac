@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { users } = require("../models");
+const users = require("../models/user");
 require('dotenv').config()
 
 
@@ -10,18 +10,17 @@ module.exports = (req, res, next) => {
 
     if (!authToken || authType !== "Bearer") {
       res.status(401).send({
-        errorMessage: "로그인 후 이용 가능한 기능입니다.",
+        errorMessage: "이용할 수 없습니다.",
       });
       return;
     }
   
     try {
-      const { userId }  = jwt.verify(authToken, process.env.SECRET_KEY);
-      
-      users.findOne({
-        where: {id: userId}
-      }).then((user) => {
+      const { id }  = jwt.verify(authToken, process.env.JWT_SECRET);
+      users.findById(id).then((user) => {
+        console.log("****", user);
         res.locals.user = user;
+        console.log("****", res.locals.user);
         next();
       });
     } catch (err) {
