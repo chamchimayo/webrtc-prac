@@ -5,6 +5,8 @@ const router = express.Router()
 const authMiddleware = require("./middleware/auth_middleware")
 // const Room = require('./models/room')
 // const RoomHistory = require('./models/room-history')
+const Interview = require("./models/room")
+const Members = require("./models/user")
 
 const server = http.createServer(app)
 const io = require('socket.io')(server, {
@@ -46,9 +48,11 @@ app.get("/room/:roomName", authMiddleware, (req, res) => {
     let myRoomName = null
     // let email = null
 
-    socket.on('join_room', async (roomName, email) => {
+    socket.on('join_room', async (roomName, _id) => {
+        const findMembers = await Members.findOne({ _id })
+        console.log("_id", _id);
         myRoomName = roomName
-        email = email
+        _id = _id
 
         let isRoomExist = false
         let targetRoomObj = null
@@ -72,6 +76,7 @@ app.get("/room/:roomName", authMiddleware, (req, res) => {
                     // await roomHistoryUpdate(roomName)
                     socket.to(myRoomName).emit('exception')
                     socket.emit('reject_join')
+                    io.to(_id).emit("receive", findMembers);
                     return
                 }
                 // 방이 존재하면 그 방으로 들어감
@@ -94,7 +99,7 @@ app.get("/room/:roomName", authMiddleware, (req, res) => {
         // 어떠한 경우든 방에 참여
         targetRoomObj.users.push({
             socketId: socket.id,
-            email,
+            _id,
         })
         console.log("target: ",targetRoomObj)   // targetRoomObj === roomName, currentNum(입장인원수 -1), users
         targetRoomObj.currentNum++
@@ -105,7 +110,7 @@ app.get("/room/:roomName", authMiddleware, (req, res) => {
         // await roomHistoryUpdate(roomName)
 
         console.log(
-            `${email}이 방 ${roomName}에 입장 (${targetRoomObj.currentNum}/${MAXIMUM})`
+            `${_id}이 방 ${roomName}에 입장 (${targetRoomObj.currentNum}/${MAXIMUM})`
         )
 
         mediaStatus[roomName][socket.id] = {
