@@ -50,7 +50,7 @@ app.get("/room/:roomName", authMiddleware, async(req, res) => {
   const findMembers = await Members.findById(id);
   console.log("#####findmember", findMembers);
   
-  const aaa = await Interview.create({roomName, interviewees: findMembers.id});
+  const aaa = await Interview.create({ roomName, interviewees: findMembers.id });
   console.log("dbdbdb", aaa);
 
   io.on("connection", (socket) => {
