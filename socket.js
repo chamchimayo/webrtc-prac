@@ -34,24 +34,27 @@ let mediaStatus = {};
 
 const MAXIMUM = 5;
 
-// const roomHistoryUpdate = async (roomId) => {
-//     const room = await Room.findById(roomId)
-//     const numberOfPeopleInRoom = room.numberOfPeopleInRoom
-//     const roomHistory = await RoomHistory.findOne({ roomId })
-//     if (numberOfPeopleInRoom > roomHistory.maxPeopleNumber) {
-//         roomHistory.maxPeopleNumber = numberOfPeopleInRoom
-//     }
-//     await roomHistory.save()
-// }
-app.get("/room/:roomName", authMiddleware, async(req, res) => {
+const roomHistoryUpdate = async (roomId) => {
+  const room = await Room.findById(roomId);
+  const numberOfPeopleInRoom = room.numberOfPeopleInRoom;
+  const roomHistory = await RoomHistory.findOne({ roomId });
+  if (numberOfPeopleInRoom > roomHistory.maxPeopleNumber) {
+    roomHistory.maxPeopleNumber = numberOfPeopleInRoom;
+  }
+  await roomHistory.save();
+};
+app.get("/room/:roomName", authMiddleware, async (req, res) => {
   const { roomName } = req.params;
-  const { id } = res.locals.user;
+  const { _id } = res.locals.user;
 
-  const findMembers = await Members.findById(id);
+  const findMembers = await Members.findById(_id);
   console.log("#####findmember", findMembers);
-  
-  const aaa = await Interview.create({roomName, interviewees: findMembers.id});
-  console.log("dbdbdb", aaa);
+
+  // const aaa = await Interview.create({
+  //   roomName,
+  //   interviewees: findMembers.id,
+  // });
+  // console.log("dbdbdb", aaa);
 
   io.on("connection", (socket) => {
     console.log("here is come!!! 2");
@@ -165,46 +168,45 @@ app.get("/room/:roomName", authMiddleware, async(req, res) => {
         }
       }
 
-      // await Room.findByIdAndUpdate(myRoomName, {
-      //     $inc: { numberOfPeopleInRoom: -1 },
-      // })
+      await Room.findByIdAndUpdate(myRoomName, {
+        $inc: { numberOfPeopleInRoom: -1 },
+      });
 
-      // setTimeout(async () => {
-      //     const existRoom = await Room.findById(myRoomName)
-      //     if (existRoom?.numberOfPeopleInRoom <= 0) {
-      //         await Room.findByIdAndRemove(myRoomName)
+      setTimeout(async () => {
+        const existRoom = await Room.findById(myRoomName);
+        if (existRoom?.numberOfPeopleInRoom <= 0) {
+          await Room.findByIdAndRemove(myRoomName);
 
-      //         const roomHistory = await RoomHistory.findOne({roomId:myRoomName})
-      //         roomHistory.deletedAt = new Date()
-      //         await roomHistory.save()
+          const roomHistory = await RoomHistory.findOne({ roomId: myRoomName });
+          roomHistory.deletedAt = new Date();
+          await roomHistory.save();
 
-      //         const newRoomObjArr = roomObjArr.filter(
-      //             (roomObj) => roomObj.currentNum > 0
-      //         )
-      //         roomObjArr = newRoomObjArr
-      //         delete mediaStatus[myRoomName]
-      //         console.log(`방 ${myRoomName} 삭제됨`)
-      //     }
-      // }, 10000)
+          const newRoomObjArr = roomObjArr.filter(
+            (roomObj) => roomObj.currentNum > 0
+          );
+          roomObjArr = newRoomObjArr;
+          delete mediaStatus[myRoomName];
+          console.log(`방 ${myRoomName} 삭제됨`);
+        }
+      }, 10000);
     });
 
-    // socket.on('emoji', (roomNameFromClient, socketIdFromClient) => {
-    //     socket.to(roomNameFromClient).emit('emoji', socketIdFromClient)
-    // })
+    socket.on("emoji", (roomNameFromClient, socketIdFromClient) => {
+      socket.to(roomNameFromClient).emit("emoji", socketIdFromClient);
+    });
 
-    // socket.on(
-    //     'screensaver',
-    //     (roomNameFromClient, socketIdFromClient, check) => {
-    //         if (!mediaStatus[roomNameFromClient][socketIdFromClient]) {
-    //             mediaStatus[roomNameFromClient][socketIdFromClient] = {}
-    //         }
-    //         mediaStatus[roomNameFromClient][socketIdFromClient].screensaver =
-    //             check
-    //         socket
-    //             .to(roomNameFromClient)
-    //             .emit('screensaver', socketIdFromClient, check)
-    //     }
-    // )
+    socket.on(
+      "screensaver",
+      (roomNameFromClient, socketIdFromClient, check) => {
+        if (!mediaStatus[roomNameFromClient][socketIdFromClient]) {
+          mediaStatus[roomNameFromClient][socketIdFromClient] = {};
+        }
+        mediaStatus[roomNameFromClient][socketIdFromClient].screensaver = check;
+        socket
+          .to(roomNameFromClient)
+          .emit("screensaver", socketIdFromClient, check);
+      }
+    );
 
     socket.on("mic_check", (roomNameFromClient, socketIdFromClient, check) => {
       if (!mediaStatus[roomNameFromClient][socketIdFromClient]) {
